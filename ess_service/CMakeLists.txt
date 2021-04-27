@@ -15,3 +15,5 @@ target_sources(app PRIVATE
     ${CMAKE_SOURCE_DIR}/src/lcd.c
 )
 endif()
+
+include_directories(${CMAKE_SOURCE_DIR}/include)
