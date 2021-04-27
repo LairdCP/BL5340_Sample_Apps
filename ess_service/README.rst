@@ -22,6 +22,11 @@ Requirements
 * Pinnacle 100 or MG100 programmed with the LTE-M out-of-box demo
   application which will upload the data to AWS
 
+Service Details
+***************
+
+For details on the Bluetooth Low Energy service [see here.](docs/ble.md)
+
 Links
 *****
 

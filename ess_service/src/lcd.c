@@ -108,6 +108,7 @@ K_TIMER_DEFINE(ess_lcd_display_update_timer,
 /******************************************************************************/
 static void checkbox_event_handler(lv_obj_t *obj, lv_event_t event)
 {
+	/* Only process events where a checkbox has been ticked or unticked */
 	if (event == LV_EVENT_VALUE_CHANGED) {
 		lv_chart_series_t *series = NULL;
 		int16_t *chart_data = NULL;
@@ -128,6 +129,9 @@ static void checkbox_event_handler(lv_obj_t *obj, lv_event_t event)
 
 		if (series != NULL) {
 			if (lv_checkbox_is_checked(obj)) {
+				/* Checkbox was ticked, add the data to the
+				 * graph
+				 */
 				uint8_t i =
 					CHART_NUMBER_OF_POINTS - chart_readings;
 				while (i < CHART_NUMBER_OF_POINTS) {
@@ -136,16 +140,24 @@ static void checkbox_event_handler(lv_obj_t *obj, lv_event_t event)
 					++i;
 				}
 			} else {
+				/* Checkbox was unticked, clear the series
+				 * data
+				 */
 				lv_chart_clear_series(ui_chart, series);
-				lv_chart_refresh(ui_chart);
 			}
+
+			lv_chart_refresh(ui_chart);
 		}
 	}
 }
 
 static void button_event_handler(lv_obj_t *obj, lv_event_t event)
 {
+	/* Only process events where a button has been pressed */
 	if (event == LV_EVENT_CLICKED) {
+		/* Clear all the buffered data and remove the data from the
+		 * graph
+		 */
 		memset(chart_data_buffer_temperature, 0,
 		       CHART_NUMBER_OF_POINTS);
 		memset(chart_data_buffer_humidity, 0, CHART_NUMBER_OF_POINTS);
@@ -164,6 +176,7 @@ static void button_event_handler(lv_obj_t *obj, lv_event_t event)
 
 static void ess_lcd_display_update_handler(struct k_work *work)
 {
+	/* Triggers every 10ms to handle display updating and input handling */
 	++display_update_count;
 
 	if (display_update_count >=
@@ -193,8 +206,10 @@ void SetupLCD(void)
 	if (display_dev == NULL) {
 		LOG_ERR("Display device %s was not found.",
 			CONFIG_LVGL_DISPLAY_DEV_NAME);
+		lcd_present = false;
 		return;
 	}
+	lcd_present = true;
 
 	/* Reset buffered data */
 	memset(chart_data_buffer_temperature, 0, CHART_NUMBER_OF_POINTS);
@@ -202,6 +217,14 @@ void SetupLCD(void)
 	memset(chart_data_buffer_pressure, 0, CHART_NUMBER_OF_POINTS);
 	memset(chart_data_buffer_dew_point, 0, CHART_NUMBER_OF_POINTS);
 
+	/* Create all the UI objects and set the style information. Containers
+	 * are used to group objects and position them correctly. The main UI
+	 * has a container into which all the objects are placed, there is a
+	 * sub-container at the top for holding the graph and the graph series
+	 * checkboxes (which are grouped into another sub-container). Beneath
+	 * the graph is the clear button and a label containing information on
+	 * the application. All objects are aligned to their centres
+	 */
 	ui_container_main = lv_cont_create(lv_scr_act(), NULL);
 	lv_obj_set_auto_realign(ui_container_main, true);
 	lv_cont_set_fit(ui_container_main, LV_FIT_TIGHT);
@@ -355,6 +378,7 @@ bool IsLCDPresent(void)
 void UpdateLCDGraph(float fTemperature, float fHumidity, float fPressure,
 		    float fDewPoint)
 {
+	/* Move all the buffered data up by a position */
 	memmove(chart_data_buffer_temperature,
 		&chart_data_buffer_temperature[1],
 		sizeof(chart_data_buffer_temperature) -
@@ -369,6 +393,7 @@ void UpdateLCDGraph(float fTemperature, float fHumidity, float fPressure,
 		sizeof(chart_data_buffer_dew_point) -
 			sizeof(chart_data_buffer_temperature[0]));
 
+	/* Append the newest data to the end of the array */
 	chart_data_buffer_temperature[CHART_NUMBER_OF_POINTS - 1] =
 		(int16_t)fTemperature;
 	chart_data_buffer_humidity[CHART_NUMBER_OF_POINTS - 1] =
@@ -383,6 +408,9 @@ void UpdateLCDGraph(float fTemperature, float fHumidity, float fPressure,
 		++chart_readings;
 	}
 
+	/* Only add the data to the graph if the respective checkbox is 
+	 * ticked
+	 */
 	if (lv_checkbox_is_checked(ui_check_temperature)) {
 		lv_chart_set_next(
 			ui_chart, chart_series_temperature,
@@ -414,6 +442,9 @@ void UpdateLCDText(void)
 	uint32_t uptime_seconds = (uint32_t)(k_uptime_get() / MS_PER_SECOND);
 
 	if (remote_device_connected) {
+		/* In a connection, output the uptime and the remote BLE address
+		 * of the connected device
+		 */
 		sprintf(display_string_buffer,
 			"Up %d seconds, connected\n"
 			"Remote Address: %02x %02x%02x%02x%02x%02x%02x",
@@ -425,6 +456,9 @@ void UpdateLCDText(void)
 			remote_device_address[BLE_ADDRESS_OUTPUT_E],
 			remote_device_address[BLE_ADDRESS_OUTPUT_F]);
 	} else {
+		/* In advertising, output the uptime, the device name being
+		 * advertised and the BLE address of the advert
+		 */
 		bt_addr_le_t ble_address_local;
 		size_t ble_address_count = BLE_ADDRESS_COUNT;
 		bt_id_get(&ble_address_local, &ble_address_count);
@@ -446,6 +480,9 @@ void UpdateLCDText(void)
 void UpdateLCDConnectedAddress(bool connected, uint8_t type,
 			       const uint8_t *address)
 {
+	/* Update the local buffer if there is a remote device connected and
+	 * what the BLE address is
+	 */
 	remote_device_connected = connected;
 	if (connected == true) {
 		remote_device_type = type;
