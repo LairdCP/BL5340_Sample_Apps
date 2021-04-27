@@ -1,4 +1,4 @@
-.. _ess_service:
+.. _ess_demo:
 
 Bluetooth ESS (Environmental Sensing Service) Sample Application
 ################################################################
