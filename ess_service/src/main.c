@@ -27,7 +27,11 @@
 #include <bluetooth/gatt.h>
 #include <bluetooth/services/bas.h>
 #include <ble_ess_service.h>
+#ifdef CONFIG_LCZ_BLE_DIS
+#include <dis.h>
+#endif
 
+#include "app_version.h"
 #include "sensor.h"
 #include "dewpoint.h"
 #ifdef CONFIG_DISPLAY
@@ -161,6 +165,10 @@ void main(void)
 	bt_ready();
 
 	bt_conn_cb_register(&conn_callbacks);
+
+#ifdef CONFIG_LCZ_BLE_DIS
+	dis_initialize(APP_VERSION_STRING);
+#endif
 
 	SetupSensor();
 	ess_svc_init();
