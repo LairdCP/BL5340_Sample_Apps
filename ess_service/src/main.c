@@ -30,6 +30,9 @@
 
 #include "sensor.h"
 #include "dewpoint.h"
+#ifdef CONFIG_DISPLAY
+#include "lcd.h"
+#endif
 
 LOG_MODULE_REGISTER(main);
 
@@ -62,16 +65,30 @@ static void connected(struct bt_conn *conn, uint8_t err)
 	} else {
 		LOG_INF("Connected\n");
 	}
+
+#ifdef CONFIG_DISPLAY
+	struct bt_conn_info ble_info;
+
+	bt_conn_get_info(conn, &ble_info);
+	UpdateLCDConnectedAddress(true, ble_info.le.dst->type,
+				 ble_info.le.dst->a.val);
+#else
 	k_timer_start(&ess_svc_update_timer,
 		      K_SECONDS(ESS_SERVICE_UPDATE_TIMER_S),
 		      K_SECONDS(ESS_SERVICE_UPDATE_TIMER_S));
 	ess_svc_update_handler(NULL);
+#endif
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
 	LOG_INF("Disconnected (reason 0x%02x)\n", reason);
+
+#ifdef CONFIG_DISPLAY
+	UpdateLCDConnectedAddress(false, 0, NULL);
+#else
 	k_timer_stop(&ess_svc_update_timer);
+#endif
 }
 
 static struct bt_conn_cb conn_callbacks = {
@@ -115,6 +132,12 @@ static void ess_svc_update_handler(struct k_work *work)
 	ess_svc_update_humidity(NULL, ReadHumidity());
 	ess_svc_update_pressure(NULL, ReadPressure());
 	ess_svc_update_dew_point(NULL, nDewPoint);
+
+#ifdef CONFIG_DISPLAY
+	float fPres;
+	ReadPressureFloat(&fPres);
+	UpdateLCDGraph(fTemp, fHum, fPres, (float)nDewPoint);
+#endif
 }
 
 static void ess_svc_update_timer_handler(struct k_timer *dummy)
@@ -141,4 +164,14 @@ void main(void)
 
 	SetupSensor();
 	ess_svc_init();
+
+#ifdef CONFIG_DISPLAY
+	SetupLCD();
+
+	k_timer_start(&ess_svc_update_timer,
+		      K_SECONDS(ESS_SERVICE_UPDATE_TIMER_S),
+		      K_SECONDS(ESS_SERVICE_UPDATE_TIMER_S));
+
+	ess_svc_update_handler(NULL);
+#endif
 }
