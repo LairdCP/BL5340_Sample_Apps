@@ -1,0 +1,117 @@
+#
+# Copyright (c) 2021 Laird Connectivity
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+config BL5340_APPLICATION_CORE_COMMON
+	bool "Laird Connectivity BL5340 Application Core Common components"
+	select GPIO
+	select BOARD_ENABLE_CPUNET
+	select REBOOT
+	select SHELL
+	default y
+
+config BL5340_I2C_BME680
+	bool "Enable the I2C BME680 exerciser module"
+	default n
+	select I2C
+	select SENSOR
+	select BME680
+
+config BL5340_I2C_FT5336
+	bool "Enable the I2C FT5336 exerciser module"
+	default n
+	select I2C
+	select LVGL
+	select KSCAN
+	select KSCAN_FT5336
+	select KSCAN_FT5336_INTERRUPT
+
+config BL5340_I2C_GT24C256C
+	bool "Enable the I2C GT24C256C exerciser module"
+	default n
+	select I2C
+        select EEPROM
+        select EEPROM_AT24
+
+config BL5340_I2C_LIS3DH
+	bool "Enable the I2C LIS3DH exerciser module"
+	default n
+	select I2C
+	select SENSOR
+	select LIS2DH
+	select LIS2DH_TRIGGER
+
+config BL5340_I2C_MCP4725
+	bool "Enable the I2C MCP4725 exerciser module"
+	default n
+	select I2C
+	select DAC
+	select DAC_MCP4725
+
+config BL5340_I2C_MCP7904N
+	bool "Enable the I2C MCP7904N exerciser module"
+	default n
+	select I2C
+
+config BL5340_I2C_TCA9538
+	bool "Enable the I2C TCA9538 exerciser module"
+	default n
+	select I2C
+	select GPIO
+
+config BL5340_NFC
+	bool "Enable the NFC exerciser module"
+	default n
+	select NFC_T2T_NRFXLIB
+	select NFC_NDEF
+	select NFC_NDEF_MSG
+	select NFC_NDEF_RECORD
+	select NFC_NDEF_TEXT_RECORD
+
+config BL5340_QSPI_MX25R6435
+	bool "Enable the QSPI MX25R6435 exerciser module"
+	default n
+	select FLASH
+	select FLASH_JESD216_API
+	select NORDIC_QSPI_NOR
+
+config BL5340_SPI_ENC424J600
+	bool "Enable the SPI ENC424J600 exerciser module"
+	default n
+	select SPI
+	select NET_L2_ETHERNET
+	select NETWORKING
+	select NET_IPV4
+	select NET_TCP
+	select NET_SOCKETS
+	select NET_SOCKETS_POSIX_NAMES
+	select NET_CONFIG_SETTINGS
+	select NET_CONFIG_NEED_IPV4
+        select ETH_ENC424J600
+
+config BL5340_SPI_ILI9340
+	bool "Enable the SPI ILI9340 exerciser module"
+	default n
+	select SPI
+	select DISPLAY
+	select ILI9340
+	select LVGL
+	select LVGL_USE_LABEL
+	select LVGL_USE_CONT
+	select LVGL_USE_BTN
+
+config BL5340_GPIO_ALLOW_PIN_CHANGES
+	bool "For non-DVK builds, allows GPIO pins to be manipulated"
+	depends on !BL5340_I2C_BME680
+	depends on !BL5340_I2C_FT5336
+	depends on !BL5340_I2C_GT24C256C
+	depends on !BL5340_I2C_LIS3DH
+	depends on !BL5340_I2C_MCP4725
+	depends on !BL5340_I2C_MCP7904N
+	depends on !BL5340_I2C_TCA9538
+	depends on !BL5340_NFC
+	depends on !BL5340_QSPI_MX25R6435
+	depends on !BL5340_SPI_ENC424J600
+	depends on !BL5340_SPI_ILI9340
+	default n

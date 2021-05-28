@@ -1,0 +1,30 @@
+#
+# Copyright (c) 2021 Laird Connectivity
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+config BL5340_RPC
+	bool "Laird Connectivity BL5340 RPC Components"
+	select IPM
+	select IPM_NRFX
+	select IPM_MSG_CH_1_ENABLE
+	select IPM_MSG_CH_0_ENABLE
+	select OPENAMP
+	select TINYCBOR
+	select THREAD_CUSTOM_DATA
+	select NRF_RPC
+	select NRF_RPC_CBOR
+	default y
+
+config BL5340_RPC_CLIENT
+	bool "Enable BL5340 RPC Client behaviour"
+	select IPM_MSG_CH_1_TX
+	select IPM_MSG_CH_0_RX
+	default n
+
+config BL5340_RPC_SERVER
+	bool "Enable BL5340 RPC Server behaviour"
+	depends on !BL5340_RPC_CLIENT
+	select IPM_MSG_CH_1_RX
+	select IPM_MSG_CH_0_TX
+	default n

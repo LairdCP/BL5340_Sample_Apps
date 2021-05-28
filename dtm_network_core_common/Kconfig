@@ -1,0 +1,17 @@
+#
+# Copyright (c) 2021 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+#
+
+config BL5340_DTM_NETWORK_COMMON
+	bool "Laird Connectivity Common DTM Network Core components"
+	select GPIO
+	select NRFX_TIMER0
+	default y
+
+config BL5340_DTM_DIRECTION_FINDING
+	bool "Enables DTM Direction Finding support"
+	default n
+
+rsource "src/fem/Kconfig"
