@@ -156,6 +156,12 @@ void main(void)
 {
 	int err;
 
+	SetupSensor();
+	if (!IsSensorPresent()) {
+		LOG_ERR("Sensor not detected, application cannot start");
+		return;
+	}
+
 	err = bt_enable(NULL);
 	if (err) {
 		LOG_ERR("Bluetooth init failed (err %d)\n", err);
@@ -170,7 +176,6 @@ void main(void)
 	dis_initialize(APP_VERSION_STRING);
 #endif
 
-	SetupSensor();
 	ess_svc_init();
 
 #ifdef CONFIG_DISPLAY
