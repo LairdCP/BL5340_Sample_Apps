@@ -2,6 +2,7 @@
  * @file logger.c
  * @brief Logging application file for vibration demo
  *
+ * Copyright (c) 2021 Edge Impulse
  * Copyright (c) 2021 Laird Connectivity
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -22,78 +23,40 @@
 #include <drivers/sensor.h>
 
 #include "application.h"
-#ifdef CONFIG_DISPLAY
-#include "lcd.h"
-#endif
 
 LOG_MODULE_REGISTER(logger);
+
+#if !defined(CONFIG_APP_AXIS_X_ENABLED) && !defined(CONFIG_APP_AXIS_Y_ENABLED) && !defined(CONFIG_APP_AXIS_Z_ENABLED)
+#error "At least one axis must be enabled in the project configuration"
+#endif
+
+#if defined(CONFIG_APP_AXIS_X_ENABLED) && defined(CONFIG_APP_AXIS_Y_ENABLED) && defined(CONFIG_APP_AXIS_Z_ENABLED)
+#define AXIS_COUNT 3
+#elif (defined(CONFIG_APP_AXIS_X_ENABLED) && defined(CONFIG_APP_AXIS_Y_ENABLED) && !defined(CONFIG_APP_AXIS_Z_ENABLED)) || (defined(CONFIG_APP_AXIS_X_ENABLED) && !defined(CONFIG_APP_AXIS_Y_ENABLED) && defined(CONFIG_APP_AXIS_Z_ENABLED)) || (!defined(CONFIG_APP_AXIS_X_ENABLED) && defined(CONFIG_APP_AXIS_Y_ENABLED) && defined(CONFIG_APP_AXIS_Z_ENABLED))
+#define AXIS_COUNT 2
+#else
+#define AXIS_COUNT 1
+#endif
 
 /******************************************************************************/
 /* Local Data Definitions                                                     */
 /******************************************************************************/
-#define ACCEL_CHECK_TIMER_MS 10
-#define ACCEL_VAL1_CONVERSION_FACTOR 100
-#define ACCEL_VAL2_CONVERSION_FACTOR 10000
 #define ACCEL_ARRAY_X 0
 #define ACCEL_ARRAY_Y 1
 #define ACCEL_ARRAY_Z 2
 #define ACCEL_ARRAY_SIZE 3
 
-static void vib_log_update_handler(struct k_work *work);
-static void vib_log_update_timer_handler(struct k_timer *dummy);
-
-K_WORK_DEFINE(vib_log_update, vib_log_update_handler);
-K_TIMER_DEFINE(vib_log_update_timer, vib_log_update_timer_handler, NULL);
-
-/******************************************************************************/
-/* Local Function Prototypes                                                  */
-/******************************************************************************/
-static void vib_log_update_handler(struct k_work *work);
+const static int64_t sampling_freq = CONFIG_APP_SAMPLING_FREQUENCY_HZ;
+static int64_t time_between_samples_us = (1000000 / (sampling_freq - 1));
 
 /******************************************************************************/
 /* Global Function Definitions                                                */
 /******************************************************************************/
 void ApplicationStart(void)
 {
-#if defined(CONFIG_DISPLAY)
-	/* Display is enabled, use GUI to control application */
-	struct lcd_event_s data;
-	while (1) {
-		k_msgq_get(&lcd_event_queue, &data, K_FOREVER);
-
-		if (data.state == STATE_BUTTON_CLICKED) {
-			/* A button has been clicked */
-			if (data.object_id == OBJECT_ID_START_BUTTON) {
-				/* Start button was clicked, start the timer
-				 * for data collection and begin outputting
-				 * data to the graph and UART
-				 */
-				k_timer_start(&vib_log_update_timer,
-					      K_MSEC(ACCEL_CHECK_TIMER_MS),
-					      K_MSEC(ACCEL_CHECK_TIMER_MS));
-			} else if (data.object_id == OBJECT_ID_STOP_BUTTON) {
-				/* Stop button was clicked, stop the timer for
-				 * data collection and return to idle mode
-				 */
-				k_timer_stop(&vib_log_update_timer);
-			}
-		}
-	}
-#elif defined(CONFIG_X)
-	/* Display is disabled, use buttons to control application */
-#warning "Bug #18895 Implement button control system"
-#else
-	/* Application control is not enabled, always log data out to UART */
-	k_timer_start(&vib_log_update_timer, K_MSEC(ACCEL_CHECK_TIMER_MS),
-		      K_MSEC(ACCEL_CHECK_TIMER_MS));
-#endif
-}
-
-static void vib_log_update_handler(struct k_work *work)
-{
-	int rc;
 	struct sensor_value accel[ACCEL_ARRAY_SIZE];
 
+	/* Find LIS3DH sensor */
 	const struct device *sensor =
 		device_get_binding(DT_LABEL(DT_INST(0, st_lis2dh)));
 
@@ -103,38 +66,42 @@ static void vib_log_update_handler(struct k_work *work)
 		return;
 	}
 
-	rc = sensor_sample_fetch(sensor);
+	while (1) {
+		/* Create and use a timer for outputting readings at a fixed frequency */
+		struct k_timer next_val_timer;
+		k_timer_init(&next_val_timer, NULL, NULL);
+		k_timer_start(&next_val_timer, K_USEC(time_between_samples_us), K_NO_WAIT);
 
-	if (rc == 0 || rc == -EBADMSG) {
-		rc = sensor_channel_get(sensor, SENSOR_CHAN_ACCEL_XYZ, accel);
-
-		if (rc == 0) {
-			/* Readings returned by the sensor driver are in 10ths
-			 * of a g, convert to 0.001 units
-			 */
-			int16_t x = (accel[ACCEL_ARRAY_X].val1 *
-				     ACCEL_VAL1_CONVERSION_FACTOR) +
-				    (accel[ACCEL_ARRAY_X].val2 /
-				     ACCEL_VAL2_CONVERSION_FACTOR);
-			int16_t y = (accel[ACCEL_ARRAY_Y].val1 *
-				     ACCEL_VAL1_CONVERSION_FACTOR) +
-				    (accel[ACCEL_ARRAY_Y].val2 /
-				     ACCEL_VAL2_CONVERSION_FACTOR);
-			int16_t z = (accel[ACCEL_ARRAY_Z].val1 *
-				     ACCEL_VAL1_CONVERSION_FACTOR) +
-				    (accel[ACCEL_ARRAY_Z].val2 /
-				     ACCEL_VAL2_CONVERSION_FACTOR);
-
-#if defined(CONFIG_DISPLAY)
-			UpdateLCDGraph(x, y, z);
-#endif
-
-			printf("%d,%d,%d\n", x, y, z);
+		/* Fetch the current data value from the sensor */
+		if (sensor_sample_fetch(sensor) < 0) {
+			printf("IIS2DLPC Sensor sample update error\n");
+			return;
 		}
-	}
-}
 
-static void vib_log_update_timer_handler(struct k_timer *dummy)
-{
-	k_work_submit(&vib_log_update);
+		sensor_channel_get(sensor, SENSOR_CHAN_ACCEL_XYZ, accel);
+
+		/* Output channels which are selected by the user */
+		printf("%.3f"
+#if AXIS_COUNT > 1
+		       ",%.3f"
+#if AXIS_COUNT > 2
+		       ",%.3f"
+#endif
+#endif
+		       "\r\n"
+
+#if defined(CONFIG_APP_AXIS_X_ENABLED)
+		       , sensor_value_to_double(&accel[ACCEL_ARRAY_X])
+#endif
+#if defined(CONFIG_APP_AXIS_Y_ENABLED)
+		       , sensor_value_to_double(&accel[ACCEL_ARRAY_Y])
+#endif
+#if defined(CONFIG_APP_AXIS_Z_ENABLED)
+		       , sensor_value_to_double(&accel[ACCEL_ARRAY_Z])
+#endif
+		      );
+
+		/* Wait for next sample time to arrive */
+		while (k_timer_status_get(&next_val_timer) <= 0);
+	}
 }

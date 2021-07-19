@@ -19,17 +19,11 @@
 #include <sys/printk.h>
 #include <zephyr.h>
 #include <logging/log.h>
+#include <drivers/sensor.h>
 
 #include "application.h"
-#ifdef CONFIG_DISPLAY
-#include "lcd.h"
-#endif
 
 LOG_MODULE_REGISTER(main);
-
-/******************************************************************************/
-/* Local Data Definitions                                                     */
-/******************************************************************************/
 
 /******************************************************************************/
 /* Global Function Definitions                                                */
@@ -41,10 +35,6 @@ void main(void)
 		       DT_LABEL(DT_INST(0, st_lis2dh)));
 		return;
 	}
-
-#ifdef CONFIG_DISPLAY
-	SetupLCD();
-#endif
 
 	ApplicationStart();
 }

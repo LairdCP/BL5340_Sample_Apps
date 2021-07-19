@@ -3,54 +3,22 @@
 
 menu "Vibration Demo"
 
-choice
-	prompt "Application Mode"
-	default APP_MODE_LOG
-	help
-	  What mode the application should run in.
+config APP_AXIS_X_ENABLED
+	bool "X axis monitoring/output"
+	default n
 
-config APP_MODE_LOG
-	bool "Logging mode"
-	help
-	  In this mode, the application will read data from the
-	  accelerometer and output it over the UART (and display if
-	  configured) which can be used to gather readings for analysis
-	  and design of neural-network models.
+config APP_AXIS_Y_ENABLED
+	bool "Y axis monitoring/output"
+	default n
 
-endchoice
+config APP_AXIS_Z_ENABLED
+	bool "Z axis monitoring/output"
+	default y
 
-choice
-	prompt "System Style"
-	default APP_STYLE_GUI
-	help
-	  Specifies the style of the application and how it will
-	  operate.
-
-config APP_STYLE_GUI
-	bool "GUI-based display"
-
-config APP_STYLE_BUTTONS
-	bool "Push button input and LED output"
-
-config APP_STYLE_UNATTENDED
-	bool "No input (unattended) mode"
-	help
-	  Note that in unattended mode, nothing can be configured and
-	  the application will run constantly without any user
-	  determined input.
-
-endchoice
-
-config APP_LCD_DATA_POINTS
-    int "Number of data points to display on the graph"
-    range 10 100
-    default 40
-    help
-        Sets the number of data points for each line (X, Y and Z) to
-        display on the graph. Note that more points will result in more
-        time required to display the data. The time required to display
-        the data increases as data changes, especially if the data is
-        changing rapidly.
+config APP_SAMPLING_FREQUENCY_HZ
+	int "Sample frequency (Hz)"
+	range 1 200
+	default 200
 
 endmenu
 
