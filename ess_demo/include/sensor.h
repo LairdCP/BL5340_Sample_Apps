@@ -28,61 +28,61 @@ extern "C" {
 /**
  * @brief Sets up the sensor
  */
-void SetupSensor(void);
+void setup_sensor(void);
 
 /**
  * @brief Checks if the sensor was detected or not
  *
  * @retval False if sensor is not present, true if it is
  */
-bool IsSensorPresent(void);
+bool is_sensor_present(void);
 
 /**
  * @brief Reads the data from the sensor and stores readings internally
  */
-void ReadSensor(void);
+void read_sensor(void);
 
 /**
  * @brief Reads the latest temperature sensor reading
  *
  * @retval Temperature in degrees celsius (C) in 0.01 units
  */
-int16_t ReadTemperature(void);
+int16_t read_temperature(void);
 
 /**
  * @brief Reads the latest humidity sensor reading
  *
  * @retval Humidity in percent (%) in 0.01 units
  */
-int16_t ReadHumidity(void);
+int16_t read_humidity(void);
 
 /**
  * @brief Reads the latest pressure sensor reading
  *
  * @retval Pressure in pascals (pa) in 0.1 units
  */
-int32_t ReadPressure(void);
+int32_t read_pressure(void);
 
 /**
  * @brief Reads the latest temperature sensor reading
  *
  * @param Temperature in degrees celsius (C)
  */
-void ReadTemperatureFloat(float *fTemp);
+void read_temperature_float(float *temperature);
 
 /**
  * @brief Reads the latest humidity sensor reading
  *
  * @param Humidity in percent (%)
  */
-void ReadHumidityFloat(float *fHum);
+void read_humidity_float(float *humidity);
 
 /**
  * @brief Reads the latest pressure sensor reading
  *
  * @param Pressure in pascals (Pa)
  */
-void ReadPressureFloat(float *fPres);
+void read_pressure_float(float *pressure);
 
 #ifdef __cplusplus
 }

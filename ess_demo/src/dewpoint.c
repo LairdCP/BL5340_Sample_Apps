@@ -15,7 +15,7 @@
 /******************************************************************************/
 /* Global Function Definitions                                                */
 /******************************************************************************/
-int8_t CalculateDewPoint(float fTemp, float fHum)
+int8_t calculate_dew_point(float fTemp, float fHum)
 {
 	float hTmp =
 		(log10(fHum) - 2) / 0.4343 + (17.62 * fTemp) / (243.12 + fTemp);

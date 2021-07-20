@@ -182,7 +182,7 @@ static void ess_lcd_display_update_handler(struct k_work *work)
 	if (display_update_count >=
 	    (DISPLAY_SCREEN_UPDATE_PERIOD_MS / DISPLAY_INPUT_PERIOD_MS)) {
 		/* Only update text roughly once a second */
-		UpdateLCDText();
+		update_lcd_text();
 		display_update_count = 0;
 	}
 
@@ -197,7 +197,7 @@ static void ess_lcd_display_update_timer_handler(struct k_timer *dummy)
 /******************************************************************************/
 /* Global Function Definitions                                                */
 /******************************************************************************/
-void SetupLCD(void)
+void setup_lcd(bool error, char *error_string)
 {
 	const struct device *display_dev;
 
@@ -210,6 +210,31 @@ void SetupLCD(void)
 		return;
 	}
 	lcd_present = true;
+
+	if (error) {
+		/* Error display handler, create a minimal display environment
+		 * where the error message can be output, display the error and
+		 * return without creating the normal environment
+		 */
+		sprintf(display_string_buffer,
+			"Error occured during initialisation\n%s",
+			(error_string == NULL ? "" : error_string));
+
+		ui_container_main = lv_cont_create(lv_scr_act(), NULL);
+		lv_obj_set_auto_realign(ui_container_main, true);
+		lv_cont_set_fit(ui_container_main, LV_FIT_TIGHT);
+		lv_cont_set_layout(ui_container_main, LV_LAYOUT_COLUMN_MID);
+
+		ui_text_status = lv_label_create(ui_container_main, NULL);
+
+		lv_label_set_text(ui_text_status, display_string_buffer);
+		lv_obj_align(ui_text_status, NULL, LV_ALIGN_CENTER, 0, 0);
+
+		display_blanking_off(display_dev);
+		lv_task_handler();
+
+		return;
+	}
 
 	/* Reset buffered data */
 	memset(chart_data_buffer_temperature, 0, CHART_NUMBER_OF_POINTS);
@@ -360,7 +385,7 @@ void SetupLCD(void)
 	lv_label_set_text(ui_text_status, display_string_buffer);
 	lv_obj_align(ui_text_status, NULL, LV_ALIGN_CENTER, 0, 0);
 
-	UpdateLCDText();
+	update_lcd_text();
 
 	display_blanking_off(display_dev);
 	lv_task_handler();
@@ -370,13 +395,13 @@ void SetupLCD(void)
 		      K_MSEC(DISPLAY_INPUT_PERIOD_MS));
 }
 
-bool IsLCDPresent(void)
+bool is_lcd_present(void)
 {
 	return lcd_present;
 }
 
-void UpdateLCDGraph(float fTemperature, float fHumidity, float fPressure,
-		    float fDewPoint)
+void update_lcd_graph(float temperature, float humidity, float pressure,
+		      float dew_point)
 {
 	/* Move all the buffered data up by a position */
 	memmove(chart_data_buffer_temperature,
@@ -395,14 +420,14 @@ void UpdateLCDGraph(float fTemperature, float fHumidity, float fPressure,
 
 	/* Append the newest data to the end of the array */
 	chart_data_buffer_temperature[CHART_NUMBER_OF_POINTS - 1] =
-		(int16_t)fTemperature;
+		(int16_t)temperature;
 	chart_data_buffer_humidity[CHART_NUMBER_OF_POINTS - 1] =
-		(int16_t)fHumidity;
+		(int16_t)humidity;
 	chart_data_buffer_pressure[CHART_NUMBER_OF_POINTS - 1] =
-		(int16_t)((fPressure / PRESSURE_TO_Y_AXIS_DIVISION) -
+		(int16_t)((pressure / PRESSURE_TO_Y_AXIS_DIVISION) -
 			  PRESSURE_TO_Y_AXIS_SUBTRACTION);
 	chart_data_buffer_dew_point[CHART_NUMBER_OF_POINTS - 1] =
-		(int16_t)fDewPoint;
+		(int16_t)dew_point;
 
 	if (chart_readings < CHART_NUMBER_OF_POINTS) {
 		++chart_readings;
@@ -437,7 +462,7 @@ void UpdateLCDGraph(float fTemperature, float fHumidity, float fPressure,
 	}
 }
 
-void UpdateLCDText(void)
+void update_lcd_text(void)
 {
 	uint32_t uptime_seconds = (uint32_t)(k_uptime_get() / MS_PER_SECOND);
 
@@ -477,8 +502,8 @@ void UpdateLCDText(void)
 	lv_label_set_text(ui_text_status, display_string_buffer);
 }
 
-void UpdateLCDConnectedAddress(bool connected, uint8_t type,
-			       const uint8_t *address)
+void update_lcd_connected_address(bool connected, uint8_t type,
+				  const uint8_t *address)
 {
 	/* Update the local buffer if there is a remote device connected and
 	 * what the BLE address is
@@ -490,7 +515,7 @@ void UpdateLCDConnectedAddress(bool connected, uint8_t type,
 		       sizeof(remote_device_address));
 	}
 
-	UpdateLCDText();
+	update_lcd_text();
 }
 
 #endif

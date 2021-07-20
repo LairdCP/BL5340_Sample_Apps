@@ -39,7 +39,7 @@ static bool sensor_present = false;
 /******************************************************************************/
 /* Global Function Definitions                                                */
 /******************************************************************************/
-void SetupSensor(void)
+void setup_sensor(void)
 {
 	const struct device *dev =
 		device_get_binding(DT_LABEL(DT_INST(0, bosch_bme680)));
@@ -62,12 +62,12 @@ void SetupSensor(void)
 	humidity_value.val2 = 0;
 }
 
-bool IsSensorPresent(void)
+bool is_sensor_present(void)
 {
 	return sensor_present;
 }
 
-void ReadSensor(void)
+void read_sensor(void)
 {
 	if (sensor_present) {
 		const struct device *dev =
@@ -88,41 +88,41 @@ void ReadSensor(void)
 	}
 }
 
-int16_t ReadTemperature(void)
+int16_t read_temperature(void)
 {
 	return (temperature_value.val1 * TEMPERATURE_VAL1_MULTIPLIER) +
 	       (temperature_value.val2 / TEMPERATURE_VAL2_DIVIDER);
 }
 
-int16_t ReadHumidity(void)
+int16_t read_humidity(void)
 {
 	return (humidity_value.val1 * HUMIDITY_VAL1_MULTIPLIER) +
 	       (humidity_value.val2 / HUMIDITY_VAL2_DIVIDER);
 }
 
-int32_t ReadPressure(void)
+int32_t read_pressure(void)
 {
 	return (pressure_value.val1 * PRESSURE_VAL1_MULTIPLIER) +
 	       (pressure_value.val2 / PRESSURE_VAL2_DIVIDER);
 }
 
-void ReadTemperatureFloat(float *fTemp)
+void read_temperature_float(float *temperature)
 {
-	*fTemp = temperature_value.val2;
-	*fTemp /= FLOAT_TEMPERATURE_DIVIDER;
-	*fTemp += temperature_value.val1;
+	*temperature = temperature_value.val2;
+	*temperature /= FLOAT_TEMPERATURE_DIVIDER;
+	*temperature += temperature_value.val1;
 }
 
-void ReadHumidityFloat(float *fHum)
+void read_humidity_float(float *humidity)
 {
-	*fHum = humidity_value.val2;
-	*fHum /= FLOAT_HUMIDITY_DIVIDER;
-	*fHum += humidity_value.val1;
+	*humidity = humidity_value.val2;
+	*humidity /= FLOAT_HUMIDITY_DIVIDER;
+	*humidity += humidity_value.val1;
 }
 
-void ReadPressureFloat(float *fPres)
+void read_pressure_float(float *pressure)
 {
-	*fPres = pressure_value.val2;
-	*fPres /= FLOAT_PRESSURE_DIVIDER;
-	*fPres += ((float)pressure_value.val1) * FLOAT_PRESSURE_MULTIPLIER;
+	*pressure = pressure_value.val2;
+	*pressure /= FLOAT_PRESSURE_DIVIDER;
+	*pressure += ((float)pressure_value.val1) * FLOAT_PRESSURE_MULTIPLIER;
 }

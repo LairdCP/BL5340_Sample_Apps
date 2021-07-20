@@ -30,7 +30,7 @@ extern "C" {
  *
  * @retval Dew point in celsius
  */
-int8_t CalculateDewPoint(float fTemp, float fHum);
+int8_t calculate_dew_point(float temperature, float humidity);
 
 #ifdef __cplusplus
 }

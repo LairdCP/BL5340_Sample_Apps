@@ -31,15 +31,18 @@ extern "C" {
 /******************************************************************************/
 /**
  * @brief Sets up the LCD for use
+ *
+ * @param True if the application has failed to initialise
+ * @param String containing the error to display if in an error state
  */
-void SetupLCD(void);
+void setup_lcd(bool error, char *error_string);
 
 /**
  * @brief Checks if the sensor was detected or not
  *
  * @retval False if LCD is not present, true if it is
  */
-bool IsLCDPresent(void);
+bool is_lcd_present(void);
 
 /**
  * @brief Updates the current graph results
@@ -49,8 +52,8 @@ bool IsLCDPresent(void);
  * @param Pressure in pascals (pa)
  * @param Dew point in degrees celsius (C)
  */
-void UpdateLCDGraph(float fTemperature, float fHumidity, float fPressure,
-		    float fDewPoint);
+void update_lcd_graph(float temperature, float humidity, float pressure,
+		      float dew_point);
 
 /**
  * @brief Updates the display with the connected device's address (if connected)
@@ -59,13 +62,13 @@ void UpdateLCDGraph(float fTemperature, float fHumidity, float fPressure,
  * @param Type of the address
  * @param BLE address byte array
  */
-void UpdateLCDConnectedAddress(bool connected, uint8_t type,
-			       const uint8_t *address);
+void update_lcd_connected_address(bool connected, uint8_t type,
+				  const uint8_t *address);
 
 /**
  * @brief Updates the LCD display text
  */
-void UpdateLCDText(void);
+void update_lcd_text(void);
 
 #endif
 

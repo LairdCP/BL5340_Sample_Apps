@@ -75,8 +75,8 @@ static void connected(struct bt_conn *conn, uint8_t err)
 	struct bt_conn_info ble_info;
 
 	bt_conn_get_info(conn, &ble_info);
-	UpdateLCDConnectedAddress(true, ble_info.le.dst->type,
-				 ble_info.le.dst->a.val);
+	update_lcd_connected_address(true, ble_info.le.dst->type,
+				     ble_info.le.dst->a.val);
 #else
 	k_timer_start(&ess_svc_update_timer,
 		      K_SECONDS(ESS_SERVICE_UPDATE_TIMER_S),
@@ -90,7 +90,7 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	LOG_INF("Disconnected (reason 0x%02x)\n", reason);
 
 #ifdef CONFIG_DISPLAY
-	UpdateLCDConnectedAddress(false, 0, NULL);
+	update_lcd_connected_address(false, 0, NULL);
 #else
 	k_timer_stop(&ess_svc_update_timer);
 #endif
@@ -124,24 +124,24 @@ static void bt_ready(void)
 
 static void ess_svc_update_handler(struct k_work *work)
 {
-	int8_t nDewPoint;
-	float fTemp, fHum;
+	int8_t dew_point;
+	float temperature, humidity;
 
-	ReadSensor();
+	read_sensor();
 
-	ReadTemperatureFloat(&fTemp);
-	ReadHumidityFloat(&fHum);
-	nDewPoint = CalculateDewPoint(fTemp, fHum);
+	read_temperature_float(&temperature);
+	read_humidity_float(&humidity);
+	dew_point = calculate_dew_point(temperature, humidity);
 
-	ess_svc_update_temperature(NULL, ReadTemperature());
-	ess_svc_update_humidity(NULL, ReadHumidity());
-	ess_svc_update_pressure(NULL, ReadPressure());
-	ess_svc_update_dew_point(NULL, nDewPoint);
+	ess_svc_update_temperature(NULL, read_temperature());
+	ess_svc_update_humidity(NULL, read_humidity());
+	ess_svc_update_pressure(NULL, read_pressure());
+	ess_svc_update_dew_point(NULL, dew_point);
 
 #ifdef CONFIG_DISPLAY
-	float fPres;
-	ReadPressureFloat(&fPres);
-	UpdateLCDGraph(fTemp, fHum, fPres, (float)nDewPoint);
+	float pressure;
+	read_pressure_float(&pressure);
+	update_lcd_graph(temperature, humidity, pressure, (float)dew_point);
 #endif
 }
 
@@ -157,15 +157,21 @@ void main(void)
 {
 	int err;
 
-	SetupSensor();
-	if (!IsSensorPresent()) {
+	setup_sensor();
+	if (!is_sensor_present()) {
 		LOG_ERR("Sensor not detected, application cannot start");
+#ifdef CONFIG_DISPLAY
+		setup_lcd(true, "Sensor not detected");
+#endif
 		return;
 	}
 
 	err = bt_enable(NULL);
 	if (err) {
 		LOG_ERR("Bluetooth init failed (err %d)\n", err);
+#ifdef CONFIG_DISPLAY
+		setup_lcd(true, "Bluetooth init failed");
+#endif
 		return;
 	}
 
@@ -180,12 +186,12 @@ void main(void)
 	ess_svc_init();
 
 #ifdef CONFIG_DISPLAY
-	SetupLCD();
+	setup_lcd(false, NULL);
 
 	k_timer_start(&ess_svc_update_timer,
 		      K_SECONDS(ESS_SERVICE_START_TIMER_S),
 		      K_SECONDS(ESS_SERVICE_UPDATE_TIMER_S));
 
-	ReadSensor();
+	read_sensor();
 #endif
 }
