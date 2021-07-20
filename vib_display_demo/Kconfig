@@ -1,0 +1,19 @@
+# Copyright (c) 2021 Laird Connectivity
+# SPDX-License-Identifier: Apache-2.0
+
+menu "Vibration Display Demo"
+
+config APP_LCD_DATA_POINTS
+    int "Number of data points to display on the graph"
+    range 10 100
+    default 40
+    help
+        Sets the number of data points for each line (X, Y and Z) to
+        display on the graph. Note that more points will result in more
+        time required to display the data. The time required to display
+        the data increases as data changes, especially if the data is
+        changing rapidly.
+
+endmenu
+
+source "Kconfig.zephyr"
