@@ -43,6 +43,7 @@ LOG_MODULE_REGISTER(main);
 /******************************************************************************/
 /* Local Data Definitions                                                     */
 /******************************************************************************/
+#define ESS_SERVICE_START_TIMER_S 2
 #define ESS_SERVICE_UPDATE_TIMER_S 10
 
 static void ess_svc_update_handler(struct k_work *work);
@@ -182,9 +183,9 @@ void main(void)
 	SetupLCD();
 
 	k_timer_start(&ess_svc_update_timer,
-		      K_SECONDS(ESS_SERVICE_UPDATE_TIMER_S),
+		      K_SECONDS(ESS_SERVICE_START_TIMER_S),
 		      K_SECONDS(ESS_SERVICE_UPDATE_TIMER_S));
 
-	ess_svc_update_handler(NULL);
+	ReadSensor();
 #endif
 }
