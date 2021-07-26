@@ -386,7 +386,7 @@ A value of 0 indicates disabled and 1 enabled.
 
 ## 32kHz Oscillator Capacitor Control (Vendor Specific Command Code 0x16)
 
-The 32kHz oscillator tuning capacitors are configured using this command. Only values of 0, 6, 7 and 11 are accepted for configuration of the value. The command is sent of the form shown below, where the desired capacitor value is sent in the Vendor Specific Command Data field.
+The 32kHz oscillator tuning capacitors are configured using this command. Only values of 0, 6, 7 and 9 are accepted for configuration of the value. The command is sent of the form shown below, where the desired capacitor value is sent in the Vendor Specific Command Data field.
 
     MSB 015|014|013|012|011|010|009|008|007|006|005|004|003|002|001|000 LSB
 
@@ -396,7 +396,7 @@ The 32kHz oscillator tuning capacitors are configured using this command. Only v
          |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
          |   |   |   |   |   |   |   |   |   |   |   |   |   |   +   + ---- Payload (Vendor Specific, 0x3)
          |   |   |   |   |   |   |   |   +   +   +   +   +   + ------------ Vendor Specific Command Code (0x16)
-         |   |   +   +   +   +   +   + ------------------------------------ Vendor Specific Command Data (0x0, 0x6, 0x7 or 0xB)
+         |   |   +   +   +   +   +   + ------------------------------------ Vendor Specific Command Data (0x0, 0x6, 0x7 or 0x9)
          +   + ------------------------------------------------------------ Command Code (Transmitter Test, 0x2)
 
 The DTM commands shown in the table below can be used to configure the capacitor values.
@@ -406,7 +406,7 @@ The DTM commands shown in the table below can be used to configure the capacitor
 |        Disabled        |   0x805B    |
 |           6            |   0x865B    |
 |           7            |   0x875B    |
-|          11            |   0x8B5B    |
+|           9            |   0x895B    |
 
 ## 32kHz Oscillator Capacitor Readback (Vendor Specific Command Code 0x17)
 
@@ -432,7 +432,7 @@ The target module responds with a two byte message, with the first byte being se
 |   0x00    |        Disabled        |
 |   0x06    |           6            |
 |   0x07    |           7            |
-|   0x0B    |          11            |
+|   0x09    |           9            |
 
 ## 32MHz Oscillator Capacitor Control (Vendor Specific Command Code 0x18)
 

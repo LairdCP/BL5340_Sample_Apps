@@ -43,7 +43,7 @@ const float bl5340_vregh_external_vreghvout_value[] = { 1.8f, 2.1f, 2.4f,
 							2.7f, 3.0f, 3.3f };
 
 /* Delayed work item used to trigger a reset when VREGHVOUT is changed */
-struct k_delayed_work bl5340_vregh_reset_delayed_work;
+struct k_work_delayable bl5340_vregh_reset_delayed_work;
 
 /******************************************************************************/
 /* Local Function Prototypes                                                  */
@@ -96,11 +96,11 @@ int bl5340_vregh_set_value(uint8_t in_vregh_value)
 			if ((NRF_UICR->VREGHVOUT &
 			     BL5340_VREGH_VREGHVOUT_UNSET) == in_vregh_value) {
 				/* Initialise the delayed reset handler */
-				k_delayed_work_init(
+				k_work_init_delayable(
 					&bl5340_vregh_reset_delayed_work,
 					bl5340_vregh_reset_handler);
 				/* Then trigger it */
-				result = k_delayed_work_submit(
+				result = k_work_schedule(
 					&bl5340_vregh_reset_delayed_work,
 					K_MSEC(BL5340_VREGH_RESET_DELAY_MS));
 			}

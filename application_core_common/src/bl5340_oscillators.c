@@ -63,8 +63,8 @@ uint8_t bl5340_oscillators_get_external_32kHz_capacitor_value(void)
 	case (NRF_OSCILLATORS_LFXO_CAP_7PF):
 		result = CAPACITOR_32KHZ_VALUE_7PF;
 		break;
-	case (NRF_OSCILLATORS_LFXO_CAP_11PF):
-		result = CAPACITOR_32KHZ_VALUE_11PF;
+	case (NRF_OSCILLATORS_LFXO_CAP_9PF):
+		result = CAPACITOR_32KHZ_VALUE_9PF;
 		break;
 	default:
 		result = CAPACITOR_32KHZ_VALUE_EXTERNAL;
@@ -210,8 +210,8 @@ bl5340_oscillators_get_internal_32kHz_capacitor_value(uint8_t in_client_data)
 	case (CAPACITOR_32KHZ_VALUE_7PF):
 		result = NRF_OSCILLATORS_LFXO_CAP_7PF;
 		break;
-	case (CAPACITOR_32KHZ_VALUE_11PF):
-		result = NRF_OSCILLATORS_LFXO_CAP_11PF;
+	case (CAPACITOR_32KHZ_VALUE_9PF):
+		result = NRF_OSCILLATORS_LFXO_CAP_9PF;
 		break;
 	}
 	return (result);

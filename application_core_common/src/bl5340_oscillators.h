@@ -18,7 +18,7 @@ enum bl5340_oscillators_capacitor_32kHz_value {
 	CAPACITOR_32KHZ_VALUE_EXTERNAL = 0,
 	CAPACITOR_32KHZ_VALUE_6PF = 6,
 	CAPACITOR_32KHZ_VALUE_7PF = 7,
-	CAPACITOR_32KHZ_VALUE_11PF = 11
+	CAPACITOR_32KHZ_VALUE_9PF = 9
 };
 
 /* Min and max allowable 32MHz tuning capacitor values */

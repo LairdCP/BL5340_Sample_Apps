@@ -165,14 +165,6 @@ static void bl5340_qspi_mx25r6435_background_thread(void *unused1,
 			qspi_mx25r6435_status = 0;
 		} else {
 			/* Write the next set of data */
-			/* Disable write protection */
-			result = flash_write_protection_set(dev, false);
-			/* Flag if we failed to disable write protection */
-			if (result) {
-				BL5340_QSPI_MX25R6435_LOG_ERR(
-					"Failed to disable QSPI device protection!\n");
-				qspi_mx25r6435_status = 0;
-			}
 			/* Check if we're at the start of the test area */
 			if (!result) {
 				if (write_address ==
@@ -191,16 +183,6 @@ static void bl5340_qspi_mx25r6435_background_thread(void *unused1,
 			}
 			/* Write the next set of data */
 			if (!result) {
-				result = flash_write_protection_set(dev, false);
-				/* Flag if we failed to disable write protection */
-				if (result) {
-					BL5340_QSPI_MX25R6435_LOG_ERR(
-						"Failed to disable QSPI device protection!\n");
-					qspi_mx25r6435_status = 0;
-				}
-			}
-			/* Now write the data */
-			if (!result) {
 				for (index = 0;
 				     index <
 				     BL5340_QSPI_MX25R6435_NUMBER_OF_BYTES;
@@ -214,16 +196,6 @@ static void bl5340_qspi_mx25r6435_background_thread(void *unused1,
 				if (result) {
 					BL5340_QSPI_MX25R6435_LOG_ERR(
 						"Failed to write to QSPI device!\n");
-					qspi_mx25r6435_status = 0;
-				}
-			}
-			/* Enable write protection */
-			if (!result) {
-				result = flash_write_protection_set(dev, true);
-				/* And flag any errors */
-				if (result) {
-					BL5340_QSPI_MX25R6435_LOG_ERR(
-						"Failed to enable QSPI write protection!\n");
 					qspi_mx25r6435_status = 0;
 				}
 			}
