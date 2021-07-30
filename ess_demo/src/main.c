@@ -46,6 +46,9 @@ LOG_MODULE_REGISTER(main);
 #define ESS_SERVICE_START_TIMER_S 2
 #define ESS_SERVICE_UPDATE_TIMER_S 10
 
+#define ADVERTISING_INTERVAL_MIN 320 /* in 0.625ms units */
+#define ADVERTISING_INTERVAL_MAX 800 /* in 0.625ms units */
+
 static void ess_svc_update_handler(struct k_work *work);
 static void ess_svc_update_timer_handler(struct k_timer *dummy);
 
@@ -112,8 +115,12 @@ static void bt_ready(void)
 
 	LOG_INF("Bluetooth initialized\n");
 
-	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME_AD, ad, ARRAY_SIZE(ad), NULL,
-			      0);
+	err = bt_le_adv_start(BT_LE_ADV_PARAM((BT_LE_ADV_OPT_CONNECTABLE |
+					       BT_LE_ADV_OPT_USE_NAME |
+					       BT_LE_ADV_OPT_FORCE_NAME_IN_AD),
+					      ADVERTISING_INTERVAL_MIN,
+					      ADVERTISING_INTERVAL_MAX, NULL),
+			      ad, ARRAY_SIZE(ad), NULL, 0);
 	if (err) {
 		LOG_ERR("Advertising failed to start (err %d)\n", err);
 		return;

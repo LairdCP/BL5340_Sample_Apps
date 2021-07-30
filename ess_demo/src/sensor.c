@@ -30,6 +30,16 @@ LOG_MODULE_REGISTER(sensor);
 #define FLOAT_PRESSURE_DIVIDER      1000
 #define FLOAT_PRESSURE_MULTIPLIER   1000
 
+#if defined(CONFIG_BOARD_BL5340_DVK_CPUAPP)
+#define SENSOR_TYPE bosch_bme680
+#elif defined(CONFIG_BOARD_PINNACLE_100_DVK)
+#define SENSOR_TYPE bosch_bme680
+#elif defined(CONFIG_BOARD_BL654_SENSOR_BOARD)
+#define SENSOR_TYPE bosch_bme280
+#else
+#error "Unsupported board"
+#endif
+
 /******************************************************************************/
 /* Local Data Definitions                                                     */
 /******************************************************************************/
@@ -42,11 +52,11 @@ static bool sensor_present = false;
 void setup_sensor(void)
 {
 	const struct device *dev =
-		device_get_binding(DT_LABEL(DT_INST(0, bosch_bme680)));
+		device_get_binding(DT_LABEL(DT_INST(0, SENSOR_TYPE)));
 	if (dev == NULL) {
 		sensor_present = false;
 		LOG_ERR("Error! %s sensor was not found\n",
-			DT_LABEL(DT_INST(0, bosch_bme680)));
+			DT_LABEL(DT_INST(0, SENSOR_TYPE)));
 	} else {
 		sensor_present = true;
 	}
@@ -71,7 +81,7 @@ void read_sensor(void)
 {
 	if (sensor_present) {
 		const struct device *dev =
-			device_get_binding(DT_LABEL(DT_INST(0, bosch_bme680)));
+			device_get_binding(DT_LABEL(DT_INST(0, SENSOR_TYPE)));
 		sensor_sample_fetch(dev);
 		sensor_channel_get(dev, SENSOR_CHAN_AMBIENT_TEMP,
 				   &temperature_value);
