@@ -74,12 +74,14 @@ void main(void)
 	if (err) {
 		MAIN_LOG_ERR("Error during DTM initialization: %d\n", err);
 	}
+
 	/* Start the RPC via CBOR over OpenAMP interface */
 	err = bl5340_rpc_client_handlers_init();
 	if (err) {
 		MAIN_LOG_ERR("RPC Server initialization failed\n");
 		return;
 	}
+
 	for (;;) {
 		/* Will return every timeout, 625 us. */
 		current_time = dtm_wait();

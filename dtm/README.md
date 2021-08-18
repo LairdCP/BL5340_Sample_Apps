@@ -9,11 +9,12 @@ This is the DTM firmware for the BL5340 module.
 
 # Content
 
-The DTM firmware is available in Module and DVK variants.
+The DTM firmware can be built for module or development board use.
 
-For the Module variant, manipulation of the module GPIOs is supported via DTM client commands. Refer to the [DTM/Module] readme file for further details.
+* For the Module variant, manipulation of the module GPIOs is supported via DTM client commands.
+* For the Development Kit/Board (DVK) variant, drivers are included for all on-board peripherals.
 
-For the DVK variant, drivers are included for all on-board peripherals. Refer to the [DTM/DVK] readme file for further details.
+Refer to the [DTM/Application] readme file for further details on the module and DVK variants of the application core image and refer to the [DTM/Network] readme file for further details on the network core image.
 
-[DTM/Module]: dtm_module/README.md "BL5340 DTM/Module Firmware"
-[DTM/DVK]: dtm_dvk/README.md "BL5340 DTM/DVK Firmware"
+[DTM/Application]: dtm_application/README.md "BL5340 DTM Application Core Firmware"
+[DTM/Network]: dtm_network/README.md "BL5340 DTM Network Core Firmware"

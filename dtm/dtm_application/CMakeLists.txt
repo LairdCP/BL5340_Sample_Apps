@@ -6,8 +6,8 @@
 
 cmake_minimum_required(VERSION 3.13.1)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(bl5340_dtm_module_application)
-add_subdirectory(../../../application_core_common application_core_common)
-add_subdirectory(../../../rpc rpc_server)
-include_directories(../../../rpc/common)
-include_directories(../../../rpc/server)
+project(bl5340_dtm_application)
+add_subdirectory(../../common/application_core_common application_core_common)
+add_subdirectory(../../common/rpc rpc_server)
+include_directories(../../common/rpc/common)
+include_directories(../../common/rpc/server)

@@ -4,9 +4,9 @@
 source "Kconfig.zephyr"
 
 menu "BL5340 Network Core Common"
-rsource "../../../dtm_network_core_common/Kconfig"
+rsource "../../common/dtm_network_core_common/Kconfig"
 endmenu
 
 menu "BL5340 RPC Components"
-rsource "../../../rpc/Kconfig"
+rsource "../../common/rpc/Kconfig"
 endmenu
