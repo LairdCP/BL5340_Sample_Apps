@@ -10,4 +10,4 @@ development boards.
 
 * [Accelerometer display graph plotter](./vib_display_demo)
 * [Accelerometer Edge Impulse training](./vib_demo)
-* [Accelerometer Edge Impulse neural network](./vib_run_demo)
+* [Accelerometer Edge Impulse neural network (External repo - in 'vib_run_demo' folder)](https://github.com/LairdCP/BL5340_EdgeImpulse_Vibration_Demo)

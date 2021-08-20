@@ -1,11 +1,11 @@
 [![Laird Connectivity](../../docs/images/Laird_Connectivity_Logo.jpg)](https://www.lairdconnect.com/)
-# BL5340 Network Core DTM/Module firmware
+# BL5340 Network Core DTM firmware
 [![BL5340](../../docs/images/BL5340.jpg)](https://www.lairdconnect.com/wireless-modules/bluetooth-modules/bluetooth-5-modules/bl5340-series-multi-core-bluetooth-52-802154-nfc-modules)
 [![Nordic](../../docs/images/Nordic_Logo.jpg)](https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF5340)
 [![Zephyr](../../docs/images/Zephyr_Logo.jpg)](https://zephyrproject.org/)
 [![NCS](../../docs/images/Ncs_Logo.jpg)](https://www.nordicsemi.com/Software-and-tools/Software/nRF-Connect-SDK)
 
-This is the Network Core DTM firmware for the BL5340 module. It is developed in C using the nRF Connect SDK. The Application Core part must also be programmed to the target module before usage. This is predominantly to allow the underlying Zephyr RTOS to start the Network Core, but also for management of registers that cannot be accessed via the Network Core (e.g. Regulator and Oscillator control). Drivers are also included for manipulation of the module GPIOs, with the status of each controllable and readable by the DTM client. Refer to the [DTM Network Core Common] readme for further details.
+This is the Network Core DTM firmware for the BL5340 module. It is developed in C using the nRF Connect SDK. The Application Core part must also be programmed to the target module before usage. This is predominantly to allow the underlying Zephyr RTOS to start the Network Core, but also for management of registers that cannot be accessed via the Network Core (e.g. Regulator and Oscillator control). Drivers are also included for manipulation of the module GPIOs with the status of each controllable and readable by the DTM client (for the module variant) or for peripheral driver usage (for the development kit variant). Refer to the [DTM Network Core Common] readme for further details.
 
 # Content
 
