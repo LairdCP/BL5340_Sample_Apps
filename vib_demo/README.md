@@ -18,22 +18,16 @@ outputs it over the UART. Data sampling is performed at a specific
 frequency so that it is reproducible, and all data sets are operating
 at the same rate. To configure the project, run the following:
 
-```
-mkdir build
-cd build
-cmake -GNinja -DBOARD=bl5340_dvk_cpuapp ..
-```
-
-Then build the project using:
+Build the project using:
 
 ```
-ninja
+west build -p -b bl5340_dvk_cpuapp
 ```
 
 To flash the compiled code to a development kit use the command:
 
 ```
-ninja flash
+west flash
 ```
 
 Follow the Edge Impulse guide in the documentation section on the

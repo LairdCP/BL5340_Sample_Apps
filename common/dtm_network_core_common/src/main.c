@@ -9,16 +9,16 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <zephyr.h>
-#include <device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
 #include <devicetree.h>
-#include <drivers/gpio.h>
+#include <zephyr/drivers/gpio.h>
 #include <errno.h>
 #include <drivers/uart.h>
 #include "dtm.h"
 #include <tinycbor/cbor.h>
 #include <nrf_rpc.h>
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 #include "bl5340_rpc_client_interface.h"
 #include "bl5340_rpc_ids.h"
 #include "bl5340_rpc_client_handlers.h"

@@ -24,7 +24,7 @@
 #include <hal/nrf_radio.h>
 #include <helpers/nrfx_gppi.h>
 #include <nrfx_timer.h>
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 #include "bl5340_rpc_ids.h"
 #include "bl5340_rpc_client_handlers.h"
 #include <hal/nrf_vreqctrl.h>

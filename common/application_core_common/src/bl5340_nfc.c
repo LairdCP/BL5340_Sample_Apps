@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  */
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 #define LOG_LEVEL LOG_LEVEL_INF
 LOG_MODULE_REGISTER(bl5340_nfc);
 #define BL5340_NFC_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
@@ -14,7 +14,7 @@ LOG_MODULE_REGISTER(bl5340_nfc);
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 #include <nfc_t2t_lib.h>
 #include <nfc/ndef/msg.h>
 #include <nfc/ndef/text_rec.h>

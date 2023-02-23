@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 #define LOG_LEVEL LOG_LEVEL_INF
 LOG_MODULE_REGISTER(bl5340_i2c_tca9538);
 #define BL5340_I2C_TCA9538_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
@@ -14,9 +14,9 @@ LOG_MODULE_REGISTER(bl5340_i2c_tca9538);
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <zephyr.h>
-#include <device.h>
-#include <drivers/gpio.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/gpio.h>
 #include "bl5340_i2c_tca9538.h"
 #include "bl5340_gpio.h"
 

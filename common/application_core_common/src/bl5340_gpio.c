@@ -7,10 +7,10 @@
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 #include "bl5340_gpio.h"
-#include <device.h>
-#include <drivers/gpio.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/gpio.h>
 #include <string.h>
 
 /******************************************************************************/

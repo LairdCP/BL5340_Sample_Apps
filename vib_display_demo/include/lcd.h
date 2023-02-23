@@ -16,15 +16,13 @@ extern "C" {
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <device.h>
-#include <drivers/display.h>
-#include <drivers/sensor.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/display.h>
+#include <zephyr/drivers/sensor.h>
 #include <lvgl.h>
 #include <stdio.h>
-#include <sys/byteorder.h>
-#include <zephyr.h>
-
-#ifdef CONFIG_DISPLAY
+#include <zephyr/sys/byteorder.h>
+#include <zephyr/kernel.h>
 
 /******************************************************************************/
 /* Global Constants, Macros and Type Definitions                              */
@@ -74,8 +72,6 @@ bool IsLCDPresent(void);
  * @param X co-ordinate data in 0.001 g units
  */
 void UpdateLCDGraph(int16_t x, int16_t y, int16_t z);
-
-#endif
 
 #ifdef __cplusplus
 }

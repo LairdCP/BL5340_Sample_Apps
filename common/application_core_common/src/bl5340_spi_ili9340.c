@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 #define LOG_LEVEL LOG_LEVEL_INF
 LOG_MODULE_REGISTER(bl5340_spi_ili9340);
 #define BL5340_SPI_ILI9340_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
@@ -17,9 +17,9 @@ LOG_MODULE_REGISTER(bl5340_spi_ili9340);
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <zephyr.h>
-#include <device.h>
-#include <drivers/display.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/display.h>
 #include <lvgl.h>
 #include <stdio.h>
 #include <string.h>

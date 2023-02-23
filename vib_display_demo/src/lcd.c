@@ -10,8 +10,8 @@
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <logging/log.h>
-#include <drivers/display.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/drivers/display.h>
 
 #include "lcd.h"
 
@@ -193,14 +193,14 @@ static void lcd_display_update_timer_handler(struct k_timer *dummy)
 /******************************************************************************/
 void SetupLCD(void)
 {
-	const struct device *display_dev;
-
-	display_dev = device_get_binding(CONFIG_LVGL_DISPLAY_DEV_NAME);
-
+	const struct device *const display_dev = device_get_binding("DISPLAY");
 	if (display_dev == NULL) {
-		LOG_ERR("Display device %s was not found.",
-			CONFIG_LVGL_DISPLAY_DEV_NAME);
+		LOG_ERR("Display device %s was not found.", "DISPLAY");
 		lcd_present = false;
+		return;
+	}
+	if (!device_is_ready(display_dev)) {
+		printf("Device %s is not ready\n", display_dev->name);
 		return;
 	}
 	lcd_present = true;

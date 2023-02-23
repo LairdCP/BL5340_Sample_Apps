@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
  */
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 #define LOG_LEVEL LOG_LEVEL_ERR
 LOG_MODULE_REGISTER(bl5340_rpc_client_interface);
 #define RPC_CLIENT_LOG_ERR(...) LOG_ERR(__VA_ARGS__)

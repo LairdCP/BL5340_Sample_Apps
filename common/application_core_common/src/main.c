@@ -13,8 +13,8 @@
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <zephyr.h>
-#include <device.h>
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
 #include "bl5340_i2c.h"
 #include "bl5340_i2c_bme680.h"
 #include "bl5340_i2c_ft5336.h"

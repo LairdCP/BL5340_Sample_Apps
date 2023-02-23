@@ -16,16 +16,16 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-#include <sys/printk.h>
-#include <zephyr.h>
-#include <logging/log.h>
-#include <drivers/sensor.h>
-#include <drivers/gpio.h>
-#include <lcz_led.h>
+#include <zephyr/sys/printk.h>
+#include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/drivers/sensor.h>
+#include <zephyr/drivers/gpio.h>
+// #include <lcz_led.h>
 
 #include "application.h"
 #include "lcd.h"
-#include "../../../ble_gateway_firmware/app/common/include/led_configuration.h"
+// #include "../../../ble_gateway_firmware/app/common/include/led_configuration.h"
 
 LOG_MODULE_REGISTER(logger);
 
@@ -42,6 +42,9 @@ LOG_MODULE_REGISTER(logger);
 #define RECENT_ARRAY_SIZE 10
 #define RECENT_MOTION_MINIMUM 250
 #define NEGATIVE_TO_POSITIVE_MULTIPLY -1
+
+#define lcz_led_turn_on(...)
+#define lcz_led_turn_off(...)
 
 /******************************************************************************/
 /* Local Function Prototypes                                                  */
@@ -82,8 +85,7 @@ void ApplicationStart(void)
 				 * for data collection and begin outputting
 				 * data to the graph and UART
 				 */
-				k_timer_start(&vib_log_update_timer,
-					      K_MSEC(ACCEL_CHECK_TIMER_MS),
+				k_timer_start(&vib_log_update_timer, K_MSEC(ACCEL_CHECK_TIMER_MS),
 					      K_MSEC(ACCEL_CHECK_TIMER_MS));
 			} else if (data.object_id == OBJECT_ID_STOP_BUTTON) {
 				/* Stop button was clicked, stop the timer for
@@ -105,12 +107,13 @@ static void vib_log_update_handler(struct k_work *work)
 	int rc;
 	struct sensor_value accel[ACCEL_ARRAY_SIZE];
 
-	const struct device *sensor =
-		device_get_binding(DT_LABEL(DT_INST(0, st_lis2dh)));
-
+	const struct device *const sensor = DEVICE_DT_GET_ANY(st_lis2dh);
 	if (sensor == NULL) {
-		printf("Could not get %s device\n",
-		       DT_LABEL(DT_INST(0, st_lis2dh)));
+		printf("Could not get find accelerometer\n");
+		return;
+	}
+	if (!device_is_ready(sensor)) {
+		printf("Device %s is not ready\n", sensor->name);
 		return;
 	}
 
@@ -123,18 +126,12 @@ static void vib_log_update_handler(struct k_work *work)
 			/* Readings returned by the sensor driver are in 10ths
 			 * of a g, convert to 0.001 units
 			 */
-			int16_t x = (accel[ACCEL_ARRAY_X].val1 *
-				     ACCEL_VAL1_CONVERSION_FACTOR) +
-				    (accel[ACCEL_ARRAY_X].val2 /
-				     ACCEL_VAL2_CONVERSION_FACTOR);
-			int16_t y = (accel[ACCEL_ARRAY_Y].val1 *
-				     ACCEL_VAL1_CONVERSION_FACTOR) +
-				    (accel[ACCEL_ARRAY_Y].val2 /
-				     ACCEL_VAL2_CONVERSION_FACTOR);
-			int16_t z = (accel[ACCEL_ARRAY_Z].val1 *
-				     ACCEL_VAL1_CONVERSION_FACTOR) +
-				    (accel[ACCEL_ARRAY_Z].val2 /
-				     ACCEL_VAL2_CONVERSION_FACTOR);
+			int16_t x = (accel[ACCEL_ARRAY_X].val1 * ACCEL_VAL1_CONVERSION_FACTOR) +
+				    (accel[ACCEL_ARRAY_X].val2 / ACCEL_VAL2_CONVERSION_FACTOR);
+			int16_t y = (accel[ACCEL_ARRAY_Y].val1 * ACCEL_VAL1_CONVERSION_FACTOR) +
+				    (accel[ACCEL_ARRAY_Y].val2 / ACCEL_VAL2_CONVERSION_FACTOR);
+			int16_t z = (accel[ACCEL_ARRAY_Z].val1 * ACCEL_VAL1_CONVERSION_FACTOR) +
+				    (accel[ACCEL_ARRAY_Z].val2 / ACCEL_VAL2_CONVERSION_FACTOR);
 
 			UpdateLCDGraph(x, y, z);
 
@@ -218,6 +215,7 @@ static void vib_log_update_timer_handler(struct k_timer *dummy)
 
 static void configure_leds(void)
 {
+#if 0
 #if defined(CONFIG_BOARD_BL5340_DVK_CPUAPP)
 	struct lcz_led_configuration c[] = {
 		{ BLUE_LED1, LED1_DEV, LED1, LED_ACTIVE_LOW },
@@ -229,4 +227,5 @@ static void configure_leds(void)
 #error "Unsupported board selected"
 #endif
 	lcz_led_init(c, ARRAY_SIZE(c));
+#endif
 }
