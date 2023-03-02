@@ -10,12 +10,6 @@
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <stdbool.h>
-#include <zephyr/types.h>
-#include <stddef.h>
-#include <string.h>
-#include <stdio.h>
-#include <errno.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -109,11 +103,11 @@ static void vib_log_update_handler(struct k_work *work)
 
 	const struct device *const sensor = DEVICE_DT_GET_ANY(st_lis2dh);
 	if (sensor == NULL) {
-		printf("Could not get find accelerometer\n");
+		printk("Could not get find accelerometer\n");
 		return;
 	}
 	if (!device_is_ready(sensor)) {
-		printf("Device %s is not ready\n", sensor->name);
+		printk("Device %s is not ready\n", sensor->name);
 		return;
 	}
 

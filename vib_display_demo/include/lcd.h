@@ -16,12 +16,6 @@ extern "C" {
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <zephyr/device.h>
-#include <zephyr/drivers/display.h>
-#include <zephyr/drivers/sensor.h>
-#include <lvgl.h>
-#include <stdio.h>
-#include <zephyr/sys/byteorder.h>
 #include <zephyr/kernel.h>
 
 /******************************************************************************/
