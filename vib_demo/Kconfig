@@ -5,15 +5,12 @@ menu "Vibration Demo"
 
 config APP_AXIS_X_ENABLED
 	bool "X axis monitoring/output"
-	default n
 
 config APP_AXIS_Y_ENABLED
 	bool "Y axis monitoring/output"
-	default n
 
 config APP_AXIS_Z_ENABLED
 	bool "Z axis monitoring/output"
-	default y
 
 config APP_SAMPLING_FREQUENCY_HZ
 	int "Sample frequency (Hz)"

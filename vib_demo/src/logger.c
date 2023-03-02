@@ -11,20 +11,10 @@
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <errno.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
-#include <zephyr/drivers/sensor.h>
 #include <zephyr/kernel.h>
-#include <zephyr/logging/log.h>
-#include <zephyr/sys/printk.h>
-#include <zephyr/types.h>
+#include <zephyr/drivers/sensor.h>
 
 #include "application.h"
-
-LOG_MODULE_REGISTER(logger);
 
 #if !defined(CONFIG_APP_AXIS_X_ENABLED) && !defined(CONFIG_APP_AXIS_Y_ENABLED) &&                  \
 	!defined(CONFIG_APP_AXIS_Z_ENABLED)
@@ -52,18 +42,18 @@ void ApplicationStart(void)
 	/* Find LIS3DH sensor */
 	const struct device *const sensor = DEVICE_DT_GET_ANY(st_lis2dh);
 	if (sensor == NULL) {
-		printf("Could not get find accelerometer\n");
+		printk("Could not get find accelerometer\n");
 		return;
 	}
 	if (!device_is_ready(sensor)) {
-		printf("Device %s is not ready\n", sensor->name);
+		printk("Device %s is not ready\n", sensor->name);
 		return;
 	}
 
 	while (1) {
 		/* Fetch the current data value from the sensor */
 		if (sensor_sample_fetch(sensor) < 0) {
-			printf("IIS2DLPC Sensor sample update error\n");
+			printk("IIS2DLPC Sensor sample update error\n");
 			return;
 		}
 
@@ -71,15 +61,21 @@ void ApplicationStart(void)
 
 		/* Output channels which are selected by the user */
 		if (IS_ENABLED(CONFIG_APP_AXIS_X_ENABLED)) {
-			printf("%.3f", sensor_value_to_double(&accel[ACCEL_ARRAY_X]));
+			printk("%.3f,", sensor_value_to_double(&accel[ACCEL_ARRAY_X]));
+		} else {
+			printk("0.0,");
 		}
 		if (IS_ENABLED(CONFIG_APP_AXIS_Y_ENABLED)) {
-			printf("%.3f", sensor_value_to_double(&accel[ACCEL_ARRAY_Y]));
+			printk("%.3f,", sensor_value_to_double(&accel[ACCEL_ARRAY_Y]));
+		} else {
+			printk("0.0,");
 		}
 		if (IS_ENABLED(CONFIG_APP_AXIS_Z_ENABLED)) {
-			printf("%.3f", sensor_value_to_double(&accel[ACCEL_ARRAY_Z]));
+			printk("%.3f", sensor_value_to_double(&accel[ACCEL_ARRAY_Z]));
+		} else {
+			printk("0.0");
 		}
-		printk("\r\n");
+		printk("\n");
 
 		k_sleep(K_USEC(time_between_samples_us));
 	}
