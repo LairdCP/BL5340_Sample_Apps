@@ -13,10 +13,9 @@
 #include <zephyr/device.h>
 #include <devicetree.h>
 #include <zephyr/drivers/gpio.h>
-#include <errno.h>
+
 #include <drivers/uart.h>
 #include "dtm.h"
-#include <tinycbor/cbor.h>
 #include <nrf_rpc.h>
 #include <zephyr/logging/log.h>
 #include "bl5340_rpc_client_interface.h"

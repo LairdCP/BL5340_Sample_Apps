@@ -9,21 +9,18 @@
  *
  * SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
  */
-
 #include <zephyr/logging/log.h>
 #define LOG_LEVEL LOG_LEVEL_ERR
 LOG_MODULE_REGISTER(bl5340_rpc_client_interface);
-#define RPC_CLIENT_LOG_ERR(...) LOG_ERR(__VA_ARGS__)
-#define RPC_CLIENT_LOG_DBG(...) LOG_DBG(__VA_ARGS__)
 
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <errno.h>
-#include <init.h>
+
+#include <zephyr/init.h>
 #include <nrf_rpc.h>
 #include <nrf_rpc_cbor.h>
-#include <tinycbor/cbor.h>
+
 #include "bl5340_rpc_client_interface.h"
 #include "bl5340_rpc_ids.h"
 
@@ -38,8 +35,9 @@ static int bl5340_rpc_client_interface_init(const struct device *dev);
 /******************************************************************************/
 /* Global Function Definitions                                                */
 /******************************************************************************/
-void bl5340_rpc_client_interface_rsp_error_code_handle(CborValue *value,
-						       void *handler_data)
+void bl5340_rpc_client_interface_rsp_error_code_handler(
+	const struct nrf_rpc_group *group, struct nrf_rpc_cbor_ctx *ctx,
+	void *handler_data)
 {
 	CborError cbor_err;
 
@@ -63,7 +61,7 @@ void bl5340_rpc_client_interface_rsp_error_code_handle(CborValue *value,
 static void
 bl5340_rpc_client_interface_err_handler(const struct nrf_rpc_err_report *report)
 {
-	RPC_CLIENT_LOG_ERR(
+	LOG_ERR(
 		"nRF RPC error %d ocurred. See nRF RPC logs for more details.",
 		report->code);
 	k_oops();
@@ -79,14 +77,14 @@ static int bl5340_rpc_client_interface_init(const struct device *dev)
 
 	int err;
 
-	RPC_CLIENT_LOG_DBG("RPC Client Init begin\n");
+	LOG_DBG("RPC Client Init begin\n");
 
 	err = nrf_rpc_init(bl5340_rpc_client_interface_err_handler);
 	if (err) {
 		return -NRF_EINVAL;
 	}
 
-	RPC_CLIENT_LOG_DBG("RPC Client Init done\n");
+	LOG_DBG("RPC Client Init done\n");
 
 	return 0;
 }

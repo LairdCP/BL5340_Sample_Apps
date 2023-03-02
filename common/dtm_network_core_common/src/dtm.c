@@ -19,7 +19,7 @@
 #endif
 
 #include <drivers/clock_control.h>
-#include <drivers/clock_control/nrf_clock_control.h>
+#include <zephyr/drivers/clock_control/nrf_clock_control.h>
 #include <hal/nrf_nvmc.h>
 #include <hal/nrf_radio.h>
 #include <helpers/nrfx_gppi.h>

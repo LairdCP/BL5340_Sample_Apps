@@ -12,8 +12,9 @@
 /* Includes                                                                   */
 /******************************************************************************/
 #include <zephyr/kernel.h>
+#include <zephyr/sys/reboot.h>
+
 #include "bl5340_vregh.h"
-#include <power/reboot.h>
 
 /******************************************************************************/
 /* Local Constant, Macro and Type Definitions                                 */

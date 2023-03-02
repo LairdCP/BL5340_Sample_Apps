@@ -18,10 +18,9 @@ LOG_MODULE_REGISTER(bl5340_rpc_server_interface);
 /* Includes                                                                   */
 /******************************************************************************/
 #include <zephyr/device.h>
-#include <errno.h>
-#include <init.h>
+#include <zephyr/init.h>
 #include <nrf_rpc_cbor.h>
-#include <tinycbor/cbor.h>
+
 #include "bl5340_rpc_ids.h"
 #include "bl5340_rpc_server_interface.h"
 
@@ -29,7 +28,7 @@ LOG_MODULE_REGISTER(bl5340_rpc_server_interface);
 /* Local Function Prototypes                                                  */
 /******************************************************************************/
 static void bl5340_rpc_server_interface_encode_element(
-	CborEncoder *encoder,
+	struct nrf_rpc_cbor_ctx *ctx,
 	const rpc_server_message_element *message_element);
 
 static uint16_t bl5340_rpc_server_interface_get_length(
@@ -44,19 +43,21 @@ static int bl5340_rpc_server_interface_init(const struct device *dev);
 /******************************************************************************/
 /* Global Function Definitions                                                */
 /******************************************************************************/
-void bl5340_rpc_server_interface_rsp_error_code_send(int err_code)
+void bl5340_rpc_server_interface_rsp_error_code_send(
+	const struct nrf_rpc_group *group, int err_code)
 {
 	struct nrf_rpc_cbor_ctx ctx;
 
-	NRF_RPC_CBOR_ALLOC(ctx, CBOR_BUF_SIZE);
+	NRF_RPC_CBOR_ALLOC(group, ctx, CBOR_BUF_SIZE);
 
-	cbor_encode_int(&ctx.encoder, err_code);
-
-	nrf_rpc_cbor_rsp_no_err(&ctx);
+	zcbor_error(ctx.zs, err_code);
+	
+	nrf_rpc_cbor_rsp_no_err(group, &ctx);
 }
 
 void bl5340_rpc_server_interface_get_rsp(
-	int err_code, rpc_server_message_element *message_elements,
+	const struct nrf_rpc_group *group, int err_code,
+	rpc_server_message_element *message_elements,
 	uint8_t message_elements_count)
 {
 	struct nrf_rpc_cbor_ctx ctx;
@@ -67,54 +68,57 @@ void bl5340_rpc_server_interface_get_rsp(
 	length = bl5340_rpc_server_interface_get_length(message_elements,
 							message_elements_count);
 	/* Build the buffer used to hold the encoded message */
-	NRF_RPC_CBOR_ALLOC(ctx, CBOR_BUF_SIZE + length);
+	NRF_RPC_CBOR_ALLOC(group, ctx, CBOR_BUF_SIZE + length);
 	/* Add the error code to the buffer */
-	cbor_encode_int(&ctx.encoder, err_code);
+	zcbor_int32_put(ctx.zs, err_code);
 	/* Encode all passed elements */
 	for (count = 0; count < message_elements_count; count++) {
-		/* Encode the next element */
 		bl5340_rpc_server_interface_encode_element(
-			&ctx.encoder, &message_elements[count]);
+			&ctx, &message_elements[count]);
 	}
 	/* Then send the response */
-	nrf_rpc_cbor_rsp_no_err(&ctx);
+	nrf_rpc_cbor_rsp_no_err(group, &ctx);
 }
 
-void bl5340_rpc_server_interface_rsp_empty_handler(CborValue *value,
-						   void *handler_data)
+void bl5340_rpc_server_interface_rsp_empty_handler(
+	const struct nrf_rpc_group *group, struct nrf_rpc_cbor_ctx *ctx,
+	void *handler_data)
 {
+	return;
 }
 
-void bl5340_rpc_server_interface_send_byte(CborValue *packet, uint8_t in_data)
+void bl5340_rpc_server_interface_send_byte(const struct nrf_rpc_group *group,
+					   struct nrf_rpc_cbor_ctx *ctx,
+					   uint8_t in_data)
 {
 	uint64_t send_data;
 	rpc_server_message_element message_element;
 
 	/* Signal that no more data needs to be read from the data packet */
-	nrf_rpc_cbor_decoding_done(packet);
+	nrf_rpc_cbor_decoding_done(group, ctx);
 	/* Then send our response */
 	send_data = (uint64_t)in_data;
 	message_element.pValue = &send_data;
 	message_element.type = RPC_SERVER_MESSAGE_ELEMENT_TYPE_UINT64;
-	bl5340_rpc_server_interface_get_rsp(0, &message_element, 1);
+	bl5340_rpc_server_interface_get_rsp(group, 0, &message_element, 1);
 }
 
-CborError bl5340_rpc_server_interface_read_byte(CborValue *packet,
-						uint8_t *out_data)
+bool bl5340_rpc_server_interface_read_byte(const struct nrf_rpc_group *group,
+					   struct nrf_rpc_cbor_ctx *ctx,
+					   uint8_t *out_data)
 {
-	CborError cbor_err;
+	bool ok;
 	uint64_t received_data;
 
-	/* Read a uint64 from the packet */
-	cbor_err = cbor_value_get_uint64(packet, &received_data);
-	/* Convert if read OK */
-	if (!cbor_err) {
+	ok = zcbor_uint64_decode(ctx->zs, &received_data);
+	if (ok) {
 		*out_data = (uint8_t)received_data;
 	}
-	/* Signal that no more data needs to be read from the data packet */
-	nrf_rpc_cbor_decoding_done(packet);
 
-	return (cbor_err);
+	/* Signal that no more data needs to be read from the data packet */
+	nrf_rpc_cbor_decoding_done(group, ctx);
+
+	return ok;
 }
 
 /******************************************************************************/
@@ -126,27 +130,27 @@ CborError bl5340_rpc_server_interface_read_byte(CborValue *packet,
  * @param [in]message_element - The message element to encode.
  */
 static void bl5340_rpc_server_interface_encode_element(
-	CborEncoder *encoder, const rpc_server_message_element *message_element)
+	struct nrf_rpc_cbor_ctx *ctx, const rpc_server_message_element *message_element)
 {
 	switch (message_element->type) {
 	case (RPC_SERVER_MESSAGE_ELEMENT_TYPE_UINT64):
-		cbor_encode_uint(encoder,
+		zcbor_uint64_put(ctx->zs,
 				 *((uint64_t *)(message_element->pValue)));
 		break;
 	case (RPC_SERVER_MESSAGE_ELEMENT_TYPE_NINT64):
-		cbor_encode_negative_int(
-			encoder, *((uint64_t *)(message_element->pValue)));
+		zcbor_int64_put(
+			ctx->zs, *((uint64_t *)(message_element->pValue)));
 		break;
 	case (RPC_SERVER_MESSAGE_ELEMENT_TYPE_INT64):
-		cbor_encode_int(encoder,
+		zcbor_int64_put(ctx->zs,
 				*((uint64_t *)(message_element->pValue)));
 		break;
 	case (RPC_SERVER_MESSAGE_ELEMENT_TYPE_BYTE):
-		cbor_encode_simple_value(
-			encoder, *((uint8_t *)(message_element->pValue)));
+		zcbor_uint32_put(
+			ctx->zs, *((uint8_t *)(message_element->pValue)));
 		break;
 	case (RPC_SERVER_MESSAGE_ELEMENT_TYPE_STRING):
-		cbor_encode_byte_string(encoder,
+		zcbor_bstr_encode_ptr(ctx->zs,
 					((uint8_t *)(message_element->pValue)),
 					message_element->size);
 		break;

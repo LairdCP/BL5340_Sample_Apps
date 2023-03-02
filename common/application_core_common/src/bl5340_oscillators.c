@@ -13,8 +13,9 @@
 /******************************************************************************/
 #include <hal/nrf_oscillators.h>
 #include <math.h>
+#include <zephyr/drivers/clock_control/nrf_clock_control.h>
+
 #include "bl5340_oscillators.h"
-#include <drivers/clock_control/nrf_clock_control.h>
 
 /******************************************************************************/
 /* Local Constant, Macro and Type Definitions                                 */

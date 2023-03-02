@@ -11,10 +11,9 @@
 /******************************************************************************/
 /* Includes                                                                   */
 /******************************************************************************/
-#include <errno.h>
-#include <init.h>
+
+#include <zephyr/init.h>
 #include <nrf_rpc_cbor.h>
-#include <tinycbor/cbor.h>
 #include "bl5340_rpc_client_interface.h"
 #include "bl5340_rpc_ids.h"
 
@@ -49,11 +48,11 @@ int bl5340_rpc_client_handlers_init(void)
 	int err;
 	struct nrf_rpc_cbor_ctx ctx;
 
-	NRF_RPC_CBOR_ALLOC(ctx, CBOR_BUF_SIZE);
+	NRF_RPC_CBOR_ALLOC(&bl5340_group, ctx, CBOR_BUF_SIZE);
 
 	err = nrf_rpc_cbor_cmd(
 		&bl5340_group, RPC_COMMAND_BL5340_INIT, &ctx,
-		bl5340_rpc_client_interface_rsp_error_code_handle, &result);
+		bl5340_rpc_client_interface_rsp_error_code_handler, &result);
 	if (err < 0) {
 		result = err;
 	}
@@ -67,13 +66,13 @@ int bl5340_rpc_client_handlers_write_byte(uint8_t in_client_data,
 	int err;
 	struct nrf_rpc_cbor_ctx ctx;
 
-	NRF_RPC_CBOR_ALLOC(ctx, CBOR_BUF_SIZE);
+	NRF_RPC_CBOR_ALLOC(&bl5340_group, ctx, CBOR_BUF_SIZE);
 
 	cbor_encode_uint(&ctx.encoder, (uint64_t)in_client_data);
 
 	err = nrf_rpc_cbor_cmd(
 		&bl5340_group, in_command, &ctx,
-		bl5340_rpc_client_interface_rsp_error_code_handle, &result);
+		bl5340_rpc_client_interface_rsp_error_code_handler, &result);
 
 	if (err < 0) {
 		result = err;
@@ -89,7 +88,7 @@ int bl5340_rpc_client_handlers_read_byte(uint8_t *out_client_data,
 	struct nrf_rpc_cbor_ctx ctx;
 	bl5340_get_result out_result;
 
-	NRF_RPC_CBOR_ALLOC(ctx, CBOR_BUF_SIZE);
+	NRF_RPC_CBOR_ALLOC(&bl5340_group, ctx, CBOR_BUF_SIZE);
 
 	err = nrf_rpc_cbor_cmd(&bl5340_group, in_command, &ctx,
 			       bl5340_rpc_client_handlers_get_rsp, &out_result);
@@ -114,7 +113,7 @@ int bl5340_rpc_client_handlers_write_then_read_byte(
 	bl5340_get_result out_result;
 	int result = 0;
 
-	NRF_RPC_CBOR_ALLOC(ctx, CBOR_BUF_SIZE);
+	NRF_RPC_CBOR_ALLOC(&bl5340_group, ctx, CBOR_BUF_SIZE);
 
 	cbor_encode_uint(&ctx.encoder, (uint64_t)in_client_data);
 

@@ -11,14 +11,6 @@
 #error "bl5340_rpc_client_interface.h error - bl5340_rpc_client_interface.h is already included."
 #endif
 
-#ifndef CBOR_H
-#error "bl5340_rpc_client_interface.h error - cbor.h must be included first."
-#endif
-
-#ifndef _NRF_RPC_H_
-#error "bl5340_rpc_client_interface.h error - nrf_rpc.h must be included first."
-#endif
-
 #define __BL5340_RPC_CLIENT_INTERFACE_H__
 
 #include <zephyr/types.h>
@@ -35,7 +27,10 @@ extern "C" {
  * @param [in]value - Incoming CBOR message.
  * @param [out]handler_data - Pointer to result extracted from the message.
  */
-void bl5340_rpc_client_interface_rsp_error_code_handle(CborValue *value, void *handler_data);
+void bl5340_rpc_client_interface_rsp_error_code_handler(
+	const struct nrf_rpc_group *group, struct nrf_rpc_cbor_ctx *ctx,
+	void *handler_data);
+
 #ifdef __cplusplus
 }
 #endif

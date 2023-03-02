@@ -6,10 +6,6 @@
 
 cmake_minimum_required(VERSION 3.13.1)
 
-# Prepend the additional boards directory but still allow the original Zephyr
-# boards directory to be used with lower priority
-list(PREPEND BOARD_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../)
-
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(bl5340_dtm_application)
 add_subdirectory(../../common/application_core_common application_core_common)

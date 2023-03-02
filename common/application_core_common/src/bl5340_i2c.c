@@ -29,9 +29,11 @@
 /******************************************************************************/
 void bl5340_i2c_initialise_peripherals(void)
 {
+#if 0
 	/* Setup I2C GPIOs */
 	bl5340_gpio_assign(DT_PROP(DT_DRV_INST(0), sda_pin),
 			   GPIO_PIN_CNF_MCUSEL_AppMCU);
 	bl5340_gpio_assign(DT_PROP(DT_DRV_INST(0), scl_pin),
 			   GPIO_PIN_CNF_MCUSEL_AppMCU);
+#endif
 }

@@ -43,39 +43,51 @@ typedef struct __rpc_server_message_element {
 /** @brief Sends error code responses back to the client.
  *
  * Used in event of only an error code being expected by an initial request
- * (e.g. when an aynschonous call is made, during initialisation) or when
+ * (e.g. when an asynchronous call is made, during initialisation) or when
  * an actual error occurs and processing can't continue.
  *
+ * @param [in] const struct nrf_rpc_group *group - message group
  * @param [in] err_code - Error code to encode.
  */
-void bl5340_rpc_server_interface_rsp_error_code_send(int err_code);
+void bl5340_rpc_server_interface_rsp_error_code_send(
+	const struct nrf_rpc_group *group, int err_code);
 
 /** @brief Sends responses back to the client when no error has occurred
  *         during processing of the request.
  *
+ *  @param [in] const struct nrf_rpc_group *group - message group
  *  @param [in] err_code - The error code associated with the response.
  *  @param [in] message_elements - List of elements to encode.
  *  @param [in] message_elements_count - Number of elements to encode.
  */
-void bl5340_rpc_server_interface_get_rsp(int err_code,
-				  rpc_server_message_element *message_elements,
-				  uint8_t message_elements_count);
+void bl5340_rpc_server_interface_get_rsp(
+	const struct nrf_rpc_group *group, int err_code,
+	rpc_server_message_element *message_elements,
+	uint8_t message_elements_count);
 
 /** @brief Empty handler used when no action is required by the server.
  */
-void bl5340_rpc_server_interface_rsp_empty_handler(CborValue *value, void *handler_data);
+void bl5340_rpc_server_interface_rsp_empty_handler(
+	const struct nrf_rpc_group *group, struct nrf_rpc_cbor_ctx *ctx,
+	void *handler_data);
 
 /** @brief Sends a byte of data to the client.
  *
- *  @param [in] packet - The CBOR packet where the request originated.
+ *  @param [in] const struct nrf_rpc_group *group - message group
+ *  @param [in] ctx - CBOR context
  *  @param [in] in_data - The byte to send.
  */
-void bl5340_rpc_server_interface_send_byte(CborValue *packet, uint8_t in_data);
+void bl5340_rpc_server_interface_send_byte(const struct nrf_rpc_group *group,
+					   struct nrf_rpc_cbor_ctx *ctx,
+					   uint8_t in_data);
 
 /** @brief Reads a byte of data from the client.
  *
- *  @param [in] packet - The CBOR packet to read the data from.
+ *  @param [in] const struct nrf_rpc_group *group - message group
+ *  @param [in] ctx - CBOR context
  *  @param [out] out_data - The byte to send.
- *  @return A CborError code.
+ *  @return true if byte was read, false otherwise
  */
-CborError bl5340_rpc_server_interface_read_byte(CborValue *packet, uint8_t *out_data);
+bool bl5340_rpc_server_interface_read_byte(const struct nrf_rpc_group *group,
+					   struct nrf_rpc_cbor_ctx *ctx,
+					   uint8_t *out_data);
