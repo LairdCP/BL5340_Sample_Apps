@@ -6,7 +6,7 @@ menu "Vibration Display Demo"
 config APP_LCD_DATA_POINTS
     int "Number of data points to display on the graph"
     range 10 100
-    default 40
+    default 10
     help
         Sets the number of data points for each line (X, Y and Z) to
         display on the graph. Note that more points will result in more

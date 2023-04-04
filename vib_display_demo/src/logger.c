@@ -67,33 +67,8 @@ void ApplicationStart(void)
 	/* Setup LEDs for motion output */
 	configure_leds();
 
-	/* Use GUI to control application */
-	struct lcd_event_s data;
-	while (1) {
-		k_msgq_get(&lcd_event_queue, &data, K_FOREVER);
-
-		if (data.state == STATE_BUTTON_CLICKED) {
-			/* A button has been clicked */
-			if (data.object_id == OBJECT_ID_START_BUTTON) {
-				/* Start button was clicked, start the timer
-				 * for data collection and begin outputting
-				 * data to the graph and UART
-				 */
-				k_timer_start(&vib_log_update_timer, K_MSEC(ACCEL_CHECK_TIMER_MS),
-					      K_MSEC(ACCEL_CHECK_TIMER_MS));
-			} else if (data.object_id == OBJECT_ID_STOP_BUTTON) {
-				/* Stop button was clicked, stop the timer for
-				 * data collection and return to idle mode
-				 */
-				k_timer_stop(&vib_log_update_timer);
-
-				/* Turn off LEDs */
-				lcz_led_turn_off(BLUE_LED1);
-				lcz_led_turn_off(BLUE_LED2);
-				lcz_led_turn_off(BLUE_LED3);
-			}
-		}
-	}
+	k_timer_start(&vib_log_update_timer, K_MSEC(ACCEL_CHECK_TIMER_MS),
+		      K_MSEC(ACCEL_CHECK_TIMER_MS));
 }
 
 static void vib_log_update_handler(struct k_work *work)
